@@ -1,0 +1,28 @@
+{
+  "name": "test-card",
+  "version": "2.0.2",
+  "description": "A uic-card is a sheet of material that serves as an entry point to more detailed information.",
+  "main": "all-imports.html",
+  "dependencies": {},
+  "devDependencies": {
+    "browser-sync": "^2.14.0",
+    "polyserve": "^0.12.0"
+  },
+  "scripts": {
+    "start": "./node_modules/.bin/polyserve -o",
+    "serve:watch": "browser-sync start -s './demo' --ss './bower_components' './' './demo' -f '**/*.*'",
+    "test": "wct",
+    "postinstall": "bower i",
+    "lint": "polymer lint ing-uic-*.html"
+  },
+  "keywords": [
+    "card",
+    "container"
+  ],
+  "author": "Jaime Vega Martinez <Jaime.Vega.Martinez@ing.nl>",
+  "license": "ISC",
+  "bugs": {
+  },
+  "contributors": [
+  ]
+}

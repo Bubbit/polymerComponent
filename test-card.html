@@ -1,0 +1,116 @@
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../test-app-localize-behavior.html">
+
+<!--
+Material design: [Cards](https://www.google.com/design/spec/components/cards.html)
+-->
+
+<dom-module id="test-card">
+    <template>
+        <style>
+            :host {
+                --paper-card: {
+                    width: 100%;
+                    height: var(--ing-uic-card-height, auto);
+
+                    @apply(--font-size-md);
+
+                    border-radius: var(--border-radius-sm);
+                };
+
+                --paper-card-header-color: var(--primary-text-color);
+
+                --_header-border-bottom: 1px solid var(--divider-color);
+
+                --_spacer-v: var(--spacer-vertical, 8px);
+                --_spacer-h: var(--spacer-horizontal, 8px);
+
+            }
+
+            /*
+                when elevation parameter is provided, it will add a box shadow in both ing-uic-card and paper-card.
+                The intention is that the elevation is only applied in the paper-card.
+             */
+            :host {
+                display: block;
+                box-shadow: none !important;
+            }
+        </style>
+
+        <paper-card
+            image="[[image]]"
+            alt="[[alt]]"
+            preload-image="[[preloadImage]]"
+            fade-image="[[fadeImage]]"
+            placeholder-image="[[placeholderImage]]"
+            elevation="[[elevation]]">
+            <div class="ing-uic-card-header">
+                <content select="[slot='header'],[header]"></content>
+            </div>
+            <div class="ing-uic-card-content">
+                <content></content>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'test-card',
+ 
+            behaviors: [TEST.AppLocalizeBehavior],
+
+            properties: {
+                /**
+                 * The url of the title image of the card.
+                 */
+                image: {
+                    type: String,
+                    value: ''
+                },
+
+                /**
+                 * The text alternative of the card's title image.
+                 */
+                alt: {
+                    type: String
+                },
+
+                /**
+                 * When `true`, any change to the image url property will cause the
+                 * `placeholder` image to be shown until the image is fully rendered.
+                 */
+                preloadImage: {
+                    type: Boolean,
+                    value: false
+                },
+
+                /**
+                 * When `preloadImage` is true, setting `fadeImage` to true will cause the
+                 * image to fade into place.
+                 */
+                fadeImage: {
+                    type: Boolean,
+                    value: false
+                },
+
+                /**
+                 * This image will be used as a background/placeholder until the src image has
+                 * loaded. Use of a data-URI for placeholder is encouraged for instant rendering.
+                 */
+                placeholderImage: {
+                    type: String,
+                    value: null
+                },
+
+                /**
+                 * The z-depth of the card, from 0-5.
+                 */
+                elevation: {
+                    type: Number,
+                    value: 1
+                }
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,113 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<!--
+-->
+<script>
+    var TEST = window.TEST || {};
+    TEST.AppLocalizeBehavior = {
+        properties: {
+            /**
+             * The language used for translation.
+             * @private
+             */
+            language: {
+                type: String,
+                value: document.documentElement.getAttribute('lang')
+            },
+            /**
+             * The resources used for translation.
+             * @private
+             */
+            resources: {
+                type: Object
+            },
+            /**
+             * set key if the key is not in the resources.
+             * @private
+             */
+            useKeyIfMissing: {
+                type: Boolean,
+                value: true
+            },
+            /**
+             * The path to the translation files, defaults to 'assets/translation/'.
+             */
+            translationPath: {
+                type:String,
+                value: 'assets/translation/'
+            }
+        },
+
+        /**
+         * get the resources, for security reasons, fetched by means of the ing-util-ajax in stead of the iron-ajax
+         * @param path
+         * @returns {Object}
+         * @private
+         */
+        _getTranslationJson: function(path) {
+            var proto = this.constructor.prototype;
+
+            // If the global ajax object has not been initialized, initialize and cache it.
+            var ajax = proto.__localizationCache.ajax;
+            if (!ajax) {
+                ajax = proto.__localizationCache.ajax = document.createElement('iron-ajax');
+            }
+            var request = proto.__localizationCache.requests[path];
+            if (!request) {
+                ajax.url = path;
+                var request = ajax.generateRequest();
+                request.completes.then(
+                    this.__onRequestResponse.bind(this),
+                    this.__onRequestError.bind(this));
+
+                // Cache the instance so that it can be reused if the same path is loaded.
+                proto.__localizationCache.requests[path] = request;
+            } else {
+                request.completes.then(
+                    this.__onRequestResponse.bind(this),
+                    this.__onRequestError.bind(this));
+            }
+        },
+
+        /**
+         * fill the resources, fires the 'app-localize-resources-loaded' when ready
+         * @param event
+         * @private
+         */
+        __onRequestResponse: function(event) {
+            // check if json file includes the lang property. If not, put the response in the lang property
+            if (event.response && !event.response[this.language]) {
+                var tmpResp = {};
+                tmpResp[this.language] = event.response;
+                this.resources = tmpResp;
+            } else {
+                this.resources = event.response;
+            }
+            this.fire('app-localize-resources-loaded');
+        },
+
+        /**
+         * fires the 'app-localize-resources-error' when file cannot be found
+         * @param event
+         * @private
+         */
+        __onRequestError: function(event) {
+            this.fire('app-localize-resources-error');
+        },
+        /**
+         * Initialisation of the localized strings
+         *
+         */
+        attached: function () {
+            // Only fetch the json if language is set.
+            if (this.language) {
+                var path = this.translationPath;
+                path = path.match(/\/$/) === null ? path + '/': path;
+                this._getTranslationJson(this.resolveUrl(path + this.language + '.json'));
+            }
+        }
+    };
+
+    TEST.AppLocalizeBehavior = [Polymer.AppLocalizeBehavior, TEST.AppLocalizeBehavior]
+</script>
